@@ -1,0 +1,16 @@
+---
+- name: install sudo 1.9.5
+  hosts: all
+  gather_facts: False
+  remote_user: root
+
+  roles:
+    - common
+
+#---
+#- name: install sudo 1.9.5p2
+#  hosts: k8s_test_servers
+#  remote_user: root
+#
+#  roles:
+#    - k8s-test

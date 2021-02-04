@@ -1,0 +1,42 @@
+---
+- name: get version
+  shell: 'sudo --version'
+  register: sudo_old_version
+
+- name: echo old version
+  debug: var=sudo_old_version.stdout_lines[0] verbosity=0
+
+- name: scp sudo.tar.gz
+  copy: 
+    src: /srv/sudo.tar.gz
+    dest: /tmp/
+
+- name: unarchive sudo.tar.gz
+  #shell: tar -xzvf /tmp/sudo.tar.gz -C /tmp
+  unarchive:
+    src: /tmp/sudo.tar.gz
+    dest: /tmp/
+    copy: no
+
+- name: check gcc
+  yum: 
+    name: gcc
+    state: present
+
+- name: make sudo
+  shell: 'cd /tmp/sudo-1.9.5p2/ && ./configure --prefix=/usr     \
+            --libexecdir=/usr/lib      \
+            --with-secure-path         \
+            --with-all-insults         \
+            --with-env-editor          \
+            --docdir=/usr/share/doc/sudo-1.9.5p2 \
+            --with-passprompt="[sudo] password for %p: " && make'
+- name: make install sudo
+  shell: 'cd /tmp/sudo-1.9.5p2/ && make install && ln -sfv libsudo_util.so.0.0.0 /usr/lib/sudo/libsudo_util.so.0'
+
+- name: get version
+  shell: 'sudo --version'
+  register: sudo_new_version
+
+- name: echo new version
+  debug: var=sudo_new_version.stdout_lines[0] verbosity=0
